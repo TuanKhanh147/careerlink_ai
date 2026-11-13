@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerLink AI — Hướng nghiệp Thông minh cho Sinh viên</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Hệ thống AI hỗ trợ sinh viên tiếp cận cơ hội việc làm và thực tập thông minh">
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header">
+    <div class="header-container">
+        <a class="logo-group" href="#">
+            <div class="logo-badge">🎓</div>
+            <div class="logo-text">
+                <h1>CareerLink AI</h1>
+                <p>Hướng nghiệp Thông minh cho Sinh viên Việt Nam</p>
+            </div>
+        </a>
+        <div class="header-user-status">
+            <div id="userStatusBadge" class="user-badge" style="display:none;">
+                <span>👤</span>
+                <span id="userDisplayName">Sinh viên</span>
+                <span id="userRoleBadge" class="user-role-tag">SV</span>
+            </div>
+            <button class="btn btn-sm" onclick="handleLogout()"
+                id="btnLogout"
+                style="display:none; background: rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3);">
+                Đăng xuất
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="main-nav" id="mainNav" style="display:none;">
+    <div class="nav-container">
+        <div class="nav-links">
+            <button class="nav-item active" data-page="jobs" onclick="navigateTo('jobs')">
+                💼 Việc làm
+            </button>
+            <button class="nav-item" data-page="recommend" onclick="navigateTo('recommend')">
+                ✨ Gợi ý cho tôi
+            </button>
+            <button class="nav-item" data-page="chatbot" onclick="navigateTo('chatbot')">
+                🤖 AI Assistant <span class="nav-badge">AI</span>
+            </button>
+            <button class="nav-item" data-page="profile" onclick="navigateTo('profile')">
+                👤 Hồ sơ cá nhân
+            </button>
+            <button class="nav-item" data-page="applications" onclick="navigateTo('applications')">
+                📋 Hồ sơ đã nộp
+            </button>
+            <button class="nav-item" data-page="analytics" onclick="navigateTo('analytics')">
+                📊 Thống kê
+            </button>
+            <button class="nav-item" id="navRecruiterPost" data-page="post-job" onclick="navigateTo('post-job')" style="display:none;">
+                ➕ Đăng tuyển
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== AUTH SECTION ===== -->
+<div id="authSection">
+    <div class="app-container">
+        <div style="text-align: center; margin-bottom: 2rem; padding-top: 1rem;">
+            <h2 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary);">
+                🚀 Tìm kiếm cơ hội thực tập & việc làm cùng AI
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 1.05rem; margin-top: 0.5rem;">
+                Hệ thống gợi ý thông minh — Phân tích độ phù hợp — Phỏng vấn thử ảo
+            </p>
+        </div>
+
+        <div class="auth-wrapper">
+            <div class="auth-header">
+                <h2>🎓 CareerLink AI</h2>
+                <p>Đăng nhập hoặc tạo tài khoản để bắt đầu</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tabBtn_login" onclick="switchAuthTab('login')">
+                    Đăng nhập
+                </button>
+                <button class="auth-tab-btn" id="tabBtn_register" onclick="switchAuthTab('register')">
+                    Đăng ký tài khoản
+                </button>
+            </div>
+
+            <div class="auth-body">
+                <!-- Form đăng nhập -->
+                <div id="loginFormTab">
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="loginEmail" placeholder="email@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" id="loginPassword" placeholder="Nhập mật khẩu" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            🔐 Đăng nhập
+                        </button>
+                    </form>
+                    <div class="auth-footer-note">
+                        Chưa có tài khoản?
+                        <a href="#" onclick="switchAuthTab('register')" style="color: var(--primary); font-weight: 600;">
+                            Đăng ký ngay miễn phí
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Form đăng ký -->
+                <div id="regFormTab" style="display:none;">
+                    <form onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label>Họ và tên đầy đủ</label>
+                            <input type="text" id="regFullName" placeholder="Nguyễn Văn A" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="regEmail" placeholder="email@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mật khẩu (tối thiểu 6 ký tự)</label>
+                            <input type="password" id="regPassword" placeholder="Nhập mật khẩu" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label>Bạn là</label>
+                            <select id="regRole">
+                                <option value="student">🎓 Sinh viên đang tìm việc</option>
+                                <option value="recruiter">🏢 Nhà tuyển dụng</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            ✨ Tạo tài khoản ngay
+                        </button>
+                    </form>
+                    <div class="auth-footer-note">
+                        Dữ liệu được lưu trữ <strong>vĩnh viễn</strong> trong trình duyệt — không lo mất tài khoản!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MAIN APP (Sau khi đăng nhập) ===== -->
+<div id="mainAppSection" style="display:none;">
+    <div class="app-container">
+
+        <!-- === VIEW: JOBS LIST === -->
+        <div id="view-jobs" class="page-view active">
+            <div class="hero-banner">
+                <h2>💼 Cơ hội Thực tập & Việc làm</h2>
+                <p>Hệ thống AI phân tích hồ sơ của bạn và hiển thị <strong>độ phù hợp</strong> cho từng vị trí.</p>
+                <div class="hero-tags">
+                    <span class="hero-tag">🤖 AI Matching</span>
+                    <span class="hero-tag">📊 Real-time Analysis</span>
+                    <span class="hero-tag">🎯 Personalized</span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <input type="text" id="jobSearchInput" placeholder="🔍 Tìm kiếm theo tiêu đề, công ty, kỹ năng..."
+                    style="flex: 1; min-width: 200px;" oninput="renderJobsList()">
+                <select id="jobTypeFilter" onchange="renderJobsList()" style="width: auto; min-width: 180px;">
+                    <option value="all">Tất cả loại hình</option>
+                    <option value="Thực tập">Thực tập</option>
+                    <option value="Toàn thời gian">Toàn thời gian</option>
+                    <option value="Bán thời gian">Bán thời gian</option>
+                    <option value="Remote">Remote</option>
+                </select>
+            </div>
+
+            <div id="jobsListContainer">
+                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">Đang tải danh sách việc làm...</p>
+            </div>
+        </div>
+
+        <!-- === VIEW: AI RECOMMENDATIONS === -->
+        <div id="view-recommend" class="page-view">
+            <div class="hero-banner" style="background: linear-gradient(135deg, #059669, #10b981);">
+                <h2>✨ Gợi ý Việc làm Phù hợp nhất với Bạn</h2>
+                <p>AI phân tích hồ sơ và sắp xếp công việc theo <strong>độ tương thích giảm dần</strong>, kèm phân tích kỹ năng còn thiếu.</p>
+            </div>
+            <div id="recommendationsListContainer">
+                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">Đang phân tích hồ sơ...</p>
+            </div>
+        </div>
+
+        <!-- === VIEW: AI CHATBOT === -->
+        <div id="view-chatbot" class="page-view">
+            <div style="margin-bottom: 1.25rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">🤖 AI Career Assistant</h2>
+                <p style="color: var(--text-secondary);">Trợ lý AI hướng nghiệp — phỏng vấn thử — lộ trình học tập. Hoạt động 100% miễn phí ngay trong trình duyệt!</p>
+            </div>
+
+            <div class="chatbot-container">
+                <div class="chatbot-header">
+                    <div class="chatbot-title">
+                        <div class="chatbot-avatar">🤖</div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1rem;">CareerLink AI Assistant</div>
+                            <div style="font-size: 0.75rem; opacity: 0.85;">● Đang hoạt động — Sẵn sàng hỗ trợ 24/7</div>
+                        </div>
+                    </div>
+                    <button onclick="clearChatHistory()"
+                        style="background: rgba(255,255,255,0.15); border: none; color: white; padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">
+                        🗑️ Xóa lịch sử
+                    </button>
+                </div>
+
+                <div class="chatbot-messages" id="chatbotMessagesList"></div>
+
+                <div class="chat-quick-prompts">
+                    <span class="quick-prompt-chip" onclick="sendChatMessage('Gợi ý việc làm phù hợp với hồ sơ của tôi')">
+                        💼 Gợi ý việc làm
+                    </span>
+                    <span class="quick-prompt-chip" onclick="sendChatMessage('Luyện phỏng vấn thử cho tôi với')">
+                        🎤 Phỏng vấn thử
+                    </span>
+                    <span class="quick-prompt-chip" onclick="sendChatMessage('Đánh giá CV và hồ sơ của tôi')">
+                        📝 Đánh giá CV
+                    </span>
+                    <span class="quick-prompt-chip" onclick="sendChatMessage('Lộ trình học AI Machine Learning 3 tháng')">
+                        🗺️ Lộ trình AI/Data
+                    </span>
+                    <span class="quick-prompt-chip" onclick="sendChatMessage('Lộ trình học Web Frontend Backend')">
+                        🌐 Lộ trình Web Dev
+                    </span>
+                </div>
+
+                <div class="chatbot-input-bar">
+                    <input type="text" id="chatbotInput"
+                        placeholder="Hỏi về việc làm, lộ trình học tập, phỏng vấn thử..."
+                        onkeydown="if(event.key==='Enter') sendChatMessage()">
+                    <button class="btn btn-primary" onclick="sendChatMessage()">
+                        Gửi ➤
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- === VIEW: STUDENT PROFILE === -->
+        <div id="view-profile" class="page-view">
+            <div style="margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">👤 Hồ sơ Năng lực Cá nhân</h2>
+                <p style="color: var(--text-secondary);">Thông tin được lưu vĩnh viễn — cập nhật để AI đề xuất chính xác hơn!</p>
+            </div>
+
+            <div class="card">
+                <form id="profileForm" onsubmit="handleSaveProfile(event)">
+                    <div class="grid-2">
+                        <div>
+                            <div class="form-group">
+                                <label>Họ và tên đầy đủ *</label>
+                                <input type="text" id="profFullName" placeholder="Nguyễn Văn A" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Trường Đại học / Cao đẳng</label>
+                                <input type="text" id="profUniversity" placeholder="Trường Đại học Công nghệ Thông tin">
+                            </div>
+                            <div class="form-group">
+                                <label>Ngành học *</label>
+                                <input type="text" id="profMajor" placeholder="Khoa học Dữ liệu & AI" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Năm tốt nghiệp dự kiến</label>
+                                <input type="number" id="profGradYear" placeholder="2027" min="2024" max="2032">
+                            </div>
+                            <div class="form-group">
+                                <label>Điểm GPA (thang 4.0)</label>
+                                <input type="number" id="profGpa" placeholder="3.5" step="0.01" min="0" max="4">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>Kỹ năng (phân cách bằng dấu phẩy) *</label>
+                                <textarea id="profSkills" placeholder="Python, SQL, Machine Learning, React, Docker, Git..." style="min-height: 80px;"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Lĩnh vực quan tâm (phân cách bằng dấu phẩy)</label>
+                                <input type="text" id="profInterests" placeholder="Trí tuệ nhân tạo, Phát triển phần mềm, Dữ liệu lớn">
+                            </div>
+                            <div class="form-group">
+                                <label>Mục tiêu nghề nghiệp</label>
+                                <input type="text" id="profCareerGoal" placeholder="Trở thành AI Engineer tại công ty công nghệ hàng đầu">
+                            </div>
+                            <div class="form-group">
+                                <label>Tóm tắt bản thân (Elevator Pitch)</label>
+                                <textarea id="profSummary" placeholder="Sinh viên năm 3 chuyên ngành KHMT, có kinh nghiệm thực tế với Python và Machine Learning qua 2 dự án cá nhân về NLP tiếng Việt..." style="min-height: 100px;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            💾 Lưu Hồ sơ
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="navigateTo('recommend')">
+                            ✨ Xem gợi ý việc làm
+                        </button>
+                        <span style="color: var(--text-muted); font-size: 0.8rem;">
+                            🛡️ Dữ liệu được lưu vĩnh viễn trong trình duyệt
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- === VIEW: APPLICATIONS === -->
+        <div id="view-applications" class="page-view">
+            <div style="margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">📋 Hồ sơ Ứng tuyển của Bạn</h2>
+                <p style="color: var(--text-secondary);">Theo dõi trạng thái các vị trí bạn đã nộp hồ sơ</p>
+            </div>
+            <div id="applicationsListContainer"></div>
+        </div>
+
+        <!-- === VIEW: ANALYTICS === -->
+        <div id="view-analytics" class="page-view">
+            <div style="margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">📊 Thống kê & Quản lý Dữ liệu</h2>
+            </div>
+            <div id="analyticsContentContainer"></div>
+        </div>
+
+        <!-- === VIEW: POST JOB (Nhà tuyển dụng) === -->
+        <div id="view-post-job" class="page-view">
+            <div style="margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700;">➕ Đăng Tin Tuyển Dụng Mới</h2>
+                <p style="color: var(--text-secondary);">Tin sẽ được hiển thị ngay cho sinh viên phù hợp.</p>
+            </div>
+            <div class="card">
+                <form id="postJobForm" onsubmit="handlePostJob(event)">
+                    <div class="grid-2">
+                        <div>
+                            <div class="form-group">
+                                <label>Tiêu đề vị trí *</label>
+                                <input type="text" id="newJobTitle" placeholder="Thực tập sinh AI / Machine Learning" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tên công ty *</label>
+                                <input type="text" id="newJobCompany" placeholder="FPT Software" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Địa điểm làm việc</label>
+                                <input type="text" id="newJobLocation" placeholder="TP.HCM / Hà Nội / Remote">
+                            </div>
+                            <div class="form-group">
+                                <label>Mức lương / Phụ cấp</label>
+                                <input type="text" id="newJobSalary" placeholder="5 - 8 triệu / tháng">
+                            </div>
+                            <div class="form-group">
+                                <label>Loại hình công việc</label>
+                                <select id="newJobType">
+                                    <option value="Thực tập">Thực tập</option>
+                                    <option value="Toàn thời gian">Toàn thời gian</option>
+                                    <option value="Bán thời gian">Bán thời gian</option>
+                                    <option value="Remote">Remote / Hybrid</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>Mô tả công việc *</label>
+                                <textarea id="newJobDesc" placeholder="Mô tả chi tiết công việc, môi trường làm việc, cơ hội phát triển..." style="min-height: 120px;" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Kỹ năng yêu cầu (phân cách bằng dấu phẩy)</label>
+                                <input type="text" id="newJobSkills" placeholder="Python, SQL, Machine Learning, Git">
+                            </div>
+                            <div class="form-group">
+                                <label>Ngành học ưu tiên (phân cách bằng dấu phẩy)</label>
+                                <input type="text" id="newJobMajors" placeholder="Công nghệ Thông tin, Khoa học Máy tính">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            📢 Đăng tin tuyển dụng
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div><!-- /app-container -->
+</div><!-- /mainAppSection -->
+
+<!-- ===== FLOATING CHAT BUTTON ===== -->
+<div id="floatingChatTrigger" class="floating-chat-trigger" onclick="toggleFloatingChat()" style="display:none;" title="Hỏi AI về nghề nghiệp">
+    💬
+</div>
+
+<!-- ===== FLOATING CHAT POPUP ===== -->
+<div class="floating-chat-popup" id="floatingChatPopup">
+    <div class="chatbot-header" style="border-radius: 18px 18px 0 0;">
+        <div class="chatbot-title">
+            <div class="chatbot-avatar">🤖</div>
+            <div>
+                <div style="font-weight: 700; font-size: 0.95rem;">AI Career Assistant</div>
+                <div style="font-size: 0.7rem; opacity: 0.85;">● Đang trực tuyến</div>
+            </div>
+        </div>
+        <button onclick="toggleFloatingChat()"
+            style="background: rgba(255,255,255,0.2); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;">
+            ✕
+        </button>
+    </div>
+
+    <div class="chatbot-messages" id="floatingChatMessages" style="flex: 1; overflow-y: auto; padding: 1rem; gap: 0.75rem; display: flex; flex-direction: column; background: #f8fafc;"></div>
+
+    <div class="chat-quick-prompts" style="padding: 0.5rem 0.75rem;">
+        <span class="quick-prompt-chip" onclick="sendChatMessage('Gợi ý việc làm cho tôi', true)">💼 Gợi ý việc</span>
+        <span class="quick-prompt-chip" onclick="sendChatMessage('Luyện phỏng vấn thử', true)">🎤 Phỏng vấn</span>
+        <span class="quick-prompt-chip" onclick="sendChatMessage('Lộ trình học AI 3 tháng', true)">🗺️ Lộ trình</span>
+    </div>
+
+    <div class="chatbot-input-bar" style="border-radius: 0 0 18px 18px;">
+        <input type="text" id="floatingChatInput" placeholder="Nhắn tin với AI..."
+            onkeydown="if(event.key==='Enter') sendChatMessage(null, true)">
+        <button class="btn btn-primary btn-sm" onclick="sendChatMessage(null, true)">➤</button>
+    </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+    // Hiện floating chat button khi đã đăng nhập
+    const _origUpdateLogin = window.updateUIForLoggedInUser;
+    window.updateUIForLoggedInUser = function() {
+        _origUpdateLogin();
+        const ft = document.getElementById('floatingChatTrigger');
+        const btn = document.getElementById('btnLogout');
+        if (ft) ft.style.display = 'flex';
+        if (btn) btn.style.display = 'inline-flex';
+    };
+    const _origUpdateLogout = window.updateUIForLoggedOutUser;
+    window.updateUIForLoggedOutUser = function() {
+        _origUpdateLogout();
+        const nav = document.getElementById('mainNav');
+        const ft = document.getElementById('floatingChatTrigger');
+        const btn = document.getElementById('btnLogout');
+        if (nav) nav.style.display = 'none';
+        if (ft) ft.style.display = 'none';
+        if (btn) btn.style.display = 'none';
+        const popup = document.getElementById('floatingChatPopup');
+        if (popup) popup.classList.remove('open');
+    };
+
+    // Show nav khi đăng nhập
+    const _navWrapper = window.updateUIForLoggedInUser;
+    window.updateUIForLoggedInUser = function() {
+        _navWrapper();
+        const nav = document.getElementById('mainNav');
+        if (nav) nav.style.display = 'block';
+    };
+</script>
+</body>
+</html>
+
